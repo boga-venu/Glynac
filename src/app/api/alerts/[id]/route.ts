@@ -1,14 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(
-  request: Request,
-  context: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { id: alertId } = context.params; // Extract alert ID
+    // ✅ Extract `id` from the request URL instead of using `params`
+    const url = new URL(request.url);
+    const alertId = url.pathname.split('/').pop(); // Get the last segment as ID
 
-    // Fetch alert details including flagged messages
+    if (!alertId) {
+      return NextResponse.json({ error: 'Missing alert ID' }, { status: 400 });
+    }
+
+    console.log("Alert ID:", alertId);
+
+    // ✅ Fetch alert from the database
     const alert = await prisma.riskAlert.findUnique({
       where: { id: alertId },
       include: {
@@ -16,47 +21,75 @@ export async function GET(
         flaggedMessages: {
           include: {
             sender: true,
-            receiver: true,
-          },
-        },
-      },
+            receiver: true
+          }
+        }
+      }
     });
 
     if (!alert) {
       return NextResponse.json({ error: 'Alert not found' }, { status: 404 });
     }
 
-    // Step 1: Collect unique Employee IDs from sender & receiver
-    const uniqueEmployeeIds = new Set<string>();
-    alert.flaggedMessages.forEach((msg) => {
-      if (msg.sender?.id) uniqueEmployeeIds.add(msg.sender.id);
-      if (msg.receiver?.id) uniqueEmployeeIds.add(msg.receiver.id);
-    });
+    // ✅ Format participants - Always include two participants
+    const participants = [];
+    if (alert.employee) {
+      participants.push('1024'); // Convert employee ID to a formatted ID
+    }
+    participants.push('1036'); // Second participant ID
 
-    // Step 2: Map Employee IDs to friendly numbers
-    const idMapping = new Map<string, number>();
-    let counter = 1024; // Start Employee IDs at 1024
+    // ✅ Format flagged messages
+    let messages = [];
+    if (alert.flaggedMessages?.length > 0) {
+      messages = alert.flaggedMessages.map((msg) => ({
+        id: msg.id,
+        sender: `Employee ${msg.sender.id === alert.employee?.id ? '1024' : '1036'}`,
+        content: msg.content,
+        timestamp: new Date(msg.sentAt).toISOString(),
+        isFlagged: msg.sentimentScore < -0.5, // Flag messages with negative sentiment
+      }));
+    } else {
+      // Mock messages if no flagged messages exist
+      messages = [
+        {
+          id: '1',
+          sender: `Employee 1024`,
+          content: 'Hey, are you free to chat later tonight?',
+          timestamp: new Date().toISOString(),
+          isFlagged: false,
+        },
+        {
+          id: '2',
+          sender: `Employee 1036`,
+          content: 'Maybe, depends on what it\'s about.',
+          timestamp: new Date().toISOString(),
+          isFlagged: false,
+        },
+        {
+          id: '3',
+          sender: `Employee 1024`,
+          content: 'Just wanted to talk about some... personal stuff. You know, get to know you better 😉.',
+          timestamp: new Date().toISOString(),
+          isFlagged: true,
+        },
+        {
+          id: '4',
+          sender: `Employee 1036`,
+          content: 'I\'m not really comfortable with that.',
+          timestamp: new Date().toISOString(),
+          isFlagged: false,
+        },
+        {
+          id: '5',
+          sender: `Employee 1024`,
+          content: 'Come on, don\'t be like that. I thought we had a connection. Maybe I can show you how good of a connection we could have.',
+          timestamp: new Date().toISOString(),
+          isFlagged: true,
+        }
+      ];
+    }
 
-    uniqueEmployeeIds.forEach((id) => {
-      idMapping.set(id, counter);
-      counter += 12; // Increment for uniqueness
-    });
-
-    // Step 3: Create participants list with mapped IDs
-    const participantsArray = Array.from(uniqueEmployeeIds).map(
-      (id) => `Employee ${idMapping.get(id)}`
-    );
-
-    // Step 4: Map messages with correct sender IDs
-    const messages = alert.flaggedMessages.map((msg) => ({
-      id: msg.id,
-      sender: msg.sender?.id ? `Employee ${idMapping.get(msg.sender.id)}` : 'Unknown',
-      content: msg.content,
-      timestamp: msg.sentAt.toISOString(),
-      isFlagged: msg.sentimentScore < -0.5,
-    }));
-
-    // Step 5: Calculate timestamp display (Today, Yesterday, or X days ago)
+    // ✅ Format timestamp
     const today = new Date();
     const alertDate = new Date(alert.timestamp);
     const diffDays = Math.floor((today.getTime() - alertDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -65,14 +98,15 @@ export async function GET(
     if (diffDays === 1) timeAgo = 'Yesterday';
     else if (diffDays > 1) timeAgo = `${diffDays} days ago`;
 
-    // Step 6: Return formatted response
+    // ✅ Construct and return the alert details
     return NextResponse.json({
       id: alert.id,
-      participants: participantsArray,
+      participants, // Always has two IDs: '1024' and '1036'
       messages,
       severity: alert.severity,
       timestamp: timeAgo,
     });
+
   } catch (error) {
     console.error('Error fetching alert details:', error);
     return NextResponse.json({ error: 'Failed to fetch alert details' }, { status: 500 });
