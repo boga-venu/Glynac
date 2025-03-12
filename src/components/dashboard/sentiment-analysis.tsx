@@ -1,7 +1,7 @@
 // src/components/dashboard/sentiment-analysis.tsx
 'use client'
 
-import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChevronDown, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
