@@ -1,9 +1,10 @@
 // src/app/api/alerts/[id]/route.ts
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// This is the correct structure for App Router API routes
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -33,7 +34,7 @@ export async function GET(
     }
     
     // Format participants - Always include two participants
-    const participants = []
+    let participants = []
     
     // Add the main employee
     if (alert.employee) {
