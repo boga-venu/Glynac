@@ -21,7 +21,7 @@ import {
   AreaChart,
   Area
 } from 'recharts'
-import { ChevronDown, Download, Filter, AlertTriangle, User } from 'lucide-react'
+import { Download } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -30,7 +30,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import {
   useRetentionRate,
@@ -44,7 +43,6 @@ import {
 } from '@/hooks/use-retention-data'
 
 export default function RetentionPage() {
-  const [dateRange, setDateRange] = useState('30') // days
   const [departmentFilter, setDepartmentFilter] = useState('all')
 
   // Fetch retention rate
