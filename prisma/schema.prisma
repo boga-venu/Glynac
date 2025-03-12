@@ -1,0 +1,189 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model (Employees)
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String    // Will be hashed with bcrypt
+  department    String
+  position      String
+  imageUrl      String?
+  joinDate      DateTime  @default(now())
+  lastActive    DateTime  @default(now())
+  isAdmin       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  sentMessages      Message[]        @relation("SentMessages")
+  receivedMessages  Message[]        @relation("ReceivedMessages")
+  scheduleItems     CalendarItem[]
+  fileActivities    FileActivity[]
+  riskAlerts        RiskAlert[]      @relation("EmployeeRiskAlerts")
+  performanceData   PerformanceData?
+  retentionData     RetentionData?
+}
+
+// Communications
+model Message {
+  id             String   @id @default(cuid())
+  content        String
+  sentAt         DateTime @default(now())
+  sentimentScore Float    // Score from -1.0 (negative) to 1.0 (positive)
+  isNegative     Boolean  @default(false)
+  isPositive     Boolean  @default(false)
+  isNeutral      Boolean  @default(false)
+  channel        String   // email, slack, teams, etc.
+  
+  // Relations
+  senderId       String
+  sender         User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId     String
+  receiver       User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  flaggedInRisks RiskAlert[] @relation("FlaggedMessages")
+}
+
+// Calendar & Workload
+model CalendarItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  isRecurring Boolean  @default(false)
+  isOptional  Boolean  @default(false)
+  isFocusTime Boolean  @default(false)
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+// Files & Documents
+model File {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // docx, xlsx, pdf, etc.
+  size        Int      // in bytes
+  path        String
+  createdAt   DateTime @default(now())
+  lastModified DateTime @default(now())
+  
+  // Relations
+  creatorId   String
+  activities  FileActivity[]
+}
+
+model FileActivity {
+  id        String   @id @default(cuid())
+  action    String   // view, edit, download, share
+  timestamp DateTime @default(now())
+  
+  // Relations
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// Risk Management
+model RiskAlert {
+  id          String    @id @default(cuid())
+  type        String    // harassment, burnout, security, complaint, calendar_overload
+  title       String
+  description String
+  severity    String    // high, medium, low
+  timestamp   DateTime  @default(now())
+  isResolved  Boolean   @default(false)
+  resolvedAt  DateTime?
+  
+  // Relations
+  employeeId  String
+  employee    User      @relation("EmployeeRiskAlerts", fields: [employeeId], references: [id])
+  flaggedMessages Message[] @relation("FlaggedMessages")
+}
+
+// Performance Metrics
+model PerformanceData {
+  id                  String   @id @default(cuid())
+  respondTime         Float    // average time to respond in hours
+  taskCompletionRate  Float    // percentage
+  communicationVolume Int      // number of messages sent per day
+  negativityScore     Float    // measure of negative language use
+  meetingAttendance   Float    // percentage of meetings attended
+  overdueTasks        Int      
+  
+  // Relations
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id])
+  
+  // Historical data
+  dailyPerformance    DailyPerformance[]
+}
+
+model DailyPerformance {
+  id                  String   @id @default(cuid())
+  date                DateTime
+  communicationVolume Int      
+  negativityScore     Float    
+  
+  // Relations
+  performanceDataId   String
+  performanceData     PerformanceData @relation(fields: [performanceDataId], references: [id])
+}
+
+// Retention Metrics
+model RetentionData {
+  id                 String   @id @default(cuid())
+  retentionRisk      Float    // 0-100 score (higher = higher risk)
+  complaintCount     Int      // number of complaints filed
+  calendarOverload   Boolean  @default(false)
+  positiveLanguage   Float    // percentage of positive communication
+  negativeLanguage   Float    // percentage of negative communication
+  meetingLoad        Int      // hours per week in meetings
+  
+  // Relations
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id])
+  
+  // Historical data
+  monthlyRetention   MonthlyRetention[]
+}
+
+model MonthlyRetention {
+  id                 String   @id @default(cuid())
+  month              DateTime
+  complaintCount     Int      
+  positiveLanguage   Float    
+  negativeLanguage   Float    
+  
+  // Relations
+  retentionDataId    String
+  retentionData      RetentionData @relation(fields: [retentionDataId], references: [id])
+}
+
+// Company-wide Analytics
+model GlynacScore {
+  id                String   @id @default(cuid())
+  date              DateTime @default(now())
+  overallScore      Float    // 0-100
+  communicationScore Float   // 0-100
+  workloadScore     Float    // 0-100
+  wellbeingScore    Float    // 0-100
+}
+
+// Departments reference table
+model Department {
+  id    String @id @default(cuid())
+  name  String @unique
+}
