@@ -17,19 +17,9 @@ import {
   Scatter,
   ZAxis,
   LabelList,
-  Cell,
-  ReferenceLine
+  Cell
 } from 'recharts'
-import { ChevronDown, Download, Filter, AlertTriangle, User } from 'lucide-react'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import {  Download } from 'lucide-react'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import {
   usePerformanceDrags,
@@ -42,7 +32,6 @@ import {
 } from '@/hooks/use-performance-data'
 
 export default function PerformancePage() {
-  const [dateRange, setDateRange] = useState('30') // days
   const [departmentFilter, setDepartmentFilter] = useState('all')
 
   // Fetch performance drags data
