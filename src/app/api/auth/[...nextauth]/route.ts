@@ -1,12 +1,10 @@
-// src/app/api/auth/[...nextauth]/route.ts
 import { NextAuthOptions } from "next-auth";
 import { compare } from "bcrypt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth from "next-auth/next";
 import { prisma } from "@/lib/prisma";
 
-export const authOptions: NextAuthOptions = {
-  // Remove the adapter line
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -75,5 +73,5 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET
 };
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export { authOptions };
+
