@@ -21,7 +21,7 @@ interface RiskAlertsProps {
 }
 
 export function RiskAlerts({ alerts, onViewDetails }: RiskAlertsProps) {
-  const [filter, setFilter] = useState('all')
+  const [filter] = useState('all')
   
   const getIcon = (type: string) => {
     switch (type) {
