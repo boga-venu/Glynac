@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth from "next-auth/next";
 import { prisma } from "@/lib/prisma";
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   // Remove the adapter line
   providers: [
     CredentialsProvider({
@@ -78,4 +78,3 @@ const authOptions: NextAuthOptions = {
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
 
-export { authOptions };
