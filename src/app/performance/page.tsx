@@ -55,8 +55,7 @@ export default function PerformancePage() {
   // Fetch repeated topics
   const { data: repeatedTopicsData, isLoading: isLoadingTopics } = useRepeatedTopics()
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF0000']
-
+  
   return (
     <DashboardLayout>
       <div className="flex items-center justify-between mb-6">
