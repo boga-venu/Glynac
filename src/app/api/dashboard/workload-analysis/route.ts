@@ -37,18 +37,18 @@ export async function GET() {
     })
 
     // Calculate overall metrics
-    const totalUsers = await prisma.user.count()
+    //const totalUsers = await prisma.user.count()
     let totalMeetingHours = 0
     let totalFocusBlocks = 0
     let afterHoursCount = 0
 
-    const calendarData = await prisma.calendarItem.findMany({
+    /*const calendarData = await prisma.calendarItem.findMany({
       where: {
         startTime: {
           gte: new Date(new Date().setDate(new Date().getDate() - 30)) // Last 30 days
         }
       }
-    })
+    })*/
     
     // Calculate metrics (mocked for simplicity)
     totalMeetingHours = 24.3 // Average per user
