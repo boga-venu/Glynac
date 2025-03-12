@@ -1,5 +1,5 @@
 // src/app/api/employees/[id]/route.ts
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { CalendarItem, FileActivity, RiskAlert } from '@prisma/client'
 
@@ -12,12 +12,15 @@ type FileActivityWithFile = FileActivity & {
   }
 }
 
+type Context = {
+  params: Promise<{ id: string }>; // 👈 Mark params as a Promise
+};
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest, context: Context
 ) {
   try {
-    const userId = params.id
+    const { id: userId } = await context.params;
    
     // Get user with related data
     const user = await prisma.user.findUnique({
