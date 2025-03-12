@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { AlertCircle, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
