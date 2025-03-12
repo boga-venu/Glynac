@@ -148,14 +148,6 @@ The application provides several API endpoints for fetching data:
 - `/api/retention/*` - Retention analytics endpoints
 - `/api/employees/*` - Employee details endpoints
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## Acknowledgements
 
 - [shadcn/ui](https://ui.shadcn.com/) for the UI components
