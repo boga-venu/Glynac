@@ -100,7 +100,7 @@ npm run dev
 yarn dev
 ```
 
-7. Navigate to http://localhost:3000 to see the application
+7. Navigate to [Glynac](https://workspace-analytics-381y.onrender.com/) to see the application
 
 ## Production Deployment
 
