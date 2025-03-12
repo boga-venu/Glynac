@@ -1,17 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from '@/components/ui/button'
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   PieChart,
   Pie,
@@ -21,50 +17,46 @@ import {
   AreaChart,
   Area
 } from 'recharts'
-import { ChevronDown, Download, Filter, AlertTriangle, AlertCircle, User } from 'lucide-react'
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import { Download, Filter, AlertTriangle, AlertCircle } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/ui/table'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useRiskAlerts } from '@/hooks/use-dashboard-data'
-import { 
-  useSecurityRisks, 
-  useHarassmentMessages, 
-  useComplaintTrends, 
+import {
+  useSecurityRisks,
+  useHarassmentMessages,
+  useComplaintTrends,
   useUnwantedBehaviors,
   useRiskDistribution
 } from '@/hooks/use-risk-data'
 
 export default function RisksPage() {
-  const [filter, setFilter] = useState('all')
-  const [dateRange, setDateRange] = useState('30') // days
-  const [activeTab, setActiveTab] = useState('all')
-  
+
   // Fetch risk alerts data
   const { data: alertsData, isLoading: isLoadingAlerts } = useRiskAlerts()
-  
+
   // Fetch security risks
   const { data: securityRisksData, isLoading: isLoadingSecurityRisks } = useSecurityRisks()
-  
+
   // Fetch harassment messages
   const { data: harassmentData, isLoading: isLoadingHarassment } = useHarassmentMessages()
-  
+
   // Fetch complaint trends
   const { data: complaintData, isLoading: isLoadingComplaints } = useComplaintTrends()
-  
+
   // Fetch unwanted behavior
   const { data: unwantedBehaviorData, isLoading: isLoadingBehavior } = useUnwantedBehaviors()
-  
+
   // Fetch risk distribution
   const { data: riskDistributionData, isLoading: isLoadingDistribution } = useRiskDistribution()
-  
+
   const COLORS = ['#FF8042', '#0088FE', '#00C49F', '#FFBB28', '#FF0000']
-  
+
   // Format functions for tables and cards
   const getRiskLevelBadge = (level: string) => {
     switch (level.toLowerCase()) {
@@ -94,7 +86,60 @@ export default function RisksPage() {
           </Button>
         </div>
       </div>
-      
+
+      {/* Risk Alerts - Add this before your main grid */}
+      <Card className="mb-6">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-lg font-semibold">Active Risk Alerts</CardTitle>
+          <Button variant="ghost" size="sm">
+            View All
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {isLoadingAlerts ? (
+            <div className="flex justify-center items-center h-40">
+              <p>Loading alerts...</p>
+            </div>
+          ) : alertsData && alertsData.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Employee</TableHead>
+                  <TableHead>Alert</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Severity</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(alertsData?.slice(0, 5) || []).map((alert: any) => (
+                  <TableRow key={alert.id}>
+                    <TableCell className="font-medium">{alert.employeeName}</TableCell>
+                    <TableCell>{alert.title}</TableCell>
+                    <TableCell>
+                      <span className="capitalize">{alert.type.replace('_', ' ')}</span>
+                    </TableCell>
+                    <TableCell>{getRiskLevelBadge(alert.severity)}</TableCell>
+                    <TableCell>{alert.time}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm">View Details</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="flex justify-center items-center h-40">
+              <div className="text-center">
+                <p className="text-gray-500 mb-2">No active risk alerts</p>
+                <p className="text-sm text-gray-400">All identified risks are currently being managed</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-12">
         {/* Security Risks Table */}
         <Card className="md:col-span-1 lg:col-span-6">
@@ -130,7 +175,7 @@ export default function RisksPage() {
             )}
           </CardContent>
         </Card>
-        
+
         {/* Abusive Language & Harassment */}
         <Card className="md:col-span-1 lg:col-span-6">
           <CardHeader>
@@ -171,7 +216,7 @@ export default function RisksPage() {
             )}
           </CardContent>
         </Card>
-        
+
         {/* Disputes & Complaints */}
         <Card className="md:col-span-1 lg:col-span-12">
           <CardHeader>
@@ -187,29 +232,29 @@ export default function RisksPage() {
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-  data={complaintData || []}
-  margin={{ top: 10, right: 30, left: 15, bottom: 0 }} // Slight increase to left margin
->
-  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-  <XAxis dataKey="period" />
-  <YAxis 
-    label={{ 
-      value: 'Number of Complaints', 
-      angle: -90, 
-      position: 'insideLeft',
-      offset: 15,  
-      dy: 80       
-    }} 
-  />
-  <Tooltip />
-  <Area type="monotone" dataKey="count" name="Complaints" stroke="#ff5a7e" fill="#ff5a7e" fillOpacity={0.2} />
-</AreaChart>
+                    data={complaintData || []}
+                    margin={{ top: 10, right: 30, left: 15, bottom: 0 }} // Slight increase to left margin
+                  >
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                    <XAxis dataKey="period" />
+                    <YAxis
+                      label={{
+                        value: 'Number of Complaints',
+                        angle: -90,
+                        position: 'insideLeft',
+                        offset: 15,
+                        dy: 80
+                      }}
+                    />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="count" name="Complaints" stroke="#ff5a7e" fill="#ff5a7e" fillOpacity={0.2} />
+                  </AreaChart>
                 </ResponsiveContainer>
               )}
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Unwanted Behavior */}
         <Card className="md:col-span-1 lg:col-span-12">
           <CardHeader>
@@ -236,7 +281,7 @@ export default function RisksPage() {
             )}
           </CardContent>
         </Card>
-        
+
         {/* Risk Distribution Pie Chart */}
         <Card className="md:col-span-1 lg:col-span-6">
           <CardHeader>
@@ -272,7 +317,7 @@ export default function RisksPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Harassment Trends Line Chart */}
         <Card className="md:col-span-1 lg:col-span-6">
           <CardHeader>
@@ -287,7 +332,7 @@ export default function RisksPage() {
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={harassmentData ? [{month: 'Jan', count: 2}, {month: 'Feb', count: 1}] : []}
+                    data={harassmentData ? [{ month: 'Jan', count: 2 }, { month: 'Feb', count: 1 }] : []}
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
