@@ -1,15 +1,14 @@
-// src/app/api/alerts/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const alertId = params.id;
+    const { id: alertId } = context.params; // Extract alert ID
 
-    // Fetch the alert with related data
+    // Fetch alert details including flagged messages
     const alert = await prisma.riskAlert.findUnique({
       where: { id: alertId },
       include: {
@@ -27,28 +26,28 @@ export async function GET(
       return NextResponse.json({ error: 'Alert not found' }, { status: 404 });
     }
 
-    // Extract unique employee IDs
+    // Step 1: Collect unique Employee IDs from sender & receiver
     const uniqueEmployeeIds = new Set<string>();
     alert.flaggedMessages.forEach((msg) => {
       if (msg.sender?.id) uniqueEmployeeIds.add(msg.sender.id);
       if (msg.receiver?.id) uniqueEmployeeIds.add(msg.receiver.id);
     });
 
-    // Map unique employee IDs to friendly numbers (1024, 1036, etc.)
+    // Step 2: Map Employee IDs to friendly numbers
     const idMapping = new Map<string, number>();
-    let counter = 1024;
+    let counter = 1024; // Start Employee IDs at 1024
 
     uniqueEmployeeIds.forEach((id) => {
       idMapping.set(id, counter);
       counter += 12; // Increment for uniqueness
     });
 
-    // Convert participants using the mapping
+    // Step 3: Create participants list with mapped IDs
     const participantsArray = Array.from(uniqueEmployeeIds).map(
       (id) => `Employee ${idMapping.get(id)}`
     );
 
-    // Process messages and correctly assign mapped sender IDs
+    // Step 4: Map messages with correct sender IDs
     const messages = alert.flaggedMessages.map((msg) => ({
       id: msg.id,
       sender: msg.sender?.id ? `Employee ${idMapping.get(msg.sender.id)}` : 'Unknown',
@@ -57,7 +56,7 @@ export async function GET(
       isFlagged: msg.sentimentScore < -0.5,
     }));
 
-    // Calculate timestamp display
+    // Step 5: Calculate timestamp display (Today, Yesterday, or X days ago)
     const today = new Date();
     const alertDate = new Date(alert.timestamp);
     const diffDays = Math.floor((today.getTime() - alertDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -66,7 +65,7 @@ export async function GET(
     if (diffDays === 1) timeAgo = 'Yesterday';
     else if (diffDays > 1) timeAgo = `${diffDays} days ago`;
 
-    // Return response
+    // Step 6: Return formatted response
     return NextResponse.json({
       id: alert.id,
       participants: participantsArray,
