@@ -35,6 +35,16 @@ import {
   useRiskDistribution
 } from '@/hooks/use-risk-data'
 
+interface RiskAlert {
+  id: string;
+  title: string;
+  type: string;
+  severity: string;
+  time: string;
+  employeeId?: string;
+  employeeName: string;
+}
+
 export default function RisksPage() {
 
   // Fetch risk alerts data
@@ -113,20 +123,20 @@ export default function RisksPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(alertsData?.slice(0, 5) || []).map((alert: any) => (
-                  <TableRow key={alert.id}>
-                    <TableCell className="font-medium">{alert.employeeName}</TableCell>
-                    <TableCell>{alert.title}</TableCell>
-                    <TableCell>
-                      <span className="capitalize">{alert.type.replace('_', ' ')}</span>
-                    </TableCell>
-                    <TableCell>{getRiskLevelBadge(alert.severity)}</TableCell>
-                    <TableCell>{alert.time}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm">View Details</Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+              {(alertsData?.slice(0, 5) || []).map((alert: RiskAlert) => (
+  <TableRow key={alert.id}>
+    <TableCell className="font-medium">{alert.employeeName}</TableCell>
+    <TableCell>{alert.title}</TableCell>
+    <TableCell>
+      <span className="capitalize">{alert.type.replace('_', ' ')}</span>
+    </TableCell>
+    <TableCell>{getRiskLevelBadge(alert.severity)}</TableCell>
+    <TableCell>{alert.time}</TableCell>
+    <TableCell>
+      <Button variant="ghost" size="sm">View Details</Button>
+    </TableCell>
+  </TableRow>
+))}
               </TableBody>
             </Table>
           ) : (
@@ -194,7 +204,7 @@ export default function RisksPage() {
                       <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
                       <div>
                         <p className="font-medium">Message from {message.sender}:</p>
-                        <p className="text-gray-600">"{message.content}"</p>
+                        <p className="text-gray-600">&ldquo;{message.content}&rdquo;</p>
                       </div>
                     </li>
                   ))
