@@ -1,12 +1,15 @@
 // src/app/api/alerts/[id]/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// This is the correct structure for App Router API routes
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+interface RouteParams {
+  params: {
+    id: string;
+  }
+}
+
+// Updated function signature for Next.js App Router
+export async function GET(request: Request, { params }: RouteParams) {
   try {
     const alertId = params.id
    
@@ -25,25 +28,25 @@ export async function GET(
         }
       }
     })
-    
+   
     if (!alert) {
       return NextResponse.json(
         { error: 'Alert not found' },
         { status: 404 }
       )
     }
-    
+   
     // Format participants - Always include two participants
-    const participants = []
-    
+    const participants: string[] = []
+   
     // Add the main employee
     if (alert.employee) {
       participants.push('1024') // We'll convert to a friendly ID format
     }
-    
+   
     // Always add a second participant
     participants.push('1036') // Second participant ID
-    
+   
     // If no messages were flagged, create mock data
     let messages = []
     if (alert.flaggedMessages && alert.flaggedMessages.length > 0) {
@@ -94,7 +97,7 @@ export async function GET(
         }
       ]
     }
-    
+   
     // Format timestamp
     const today = new Date()
     const alertDate = new Date(alert.timestamp)
@@ -103,7 +106,7 @@ export async function GET(
     let timeAgo = 'Today'
     if (diffDays === 1) timeAgo = 'Yesterday'
     else if (diffDays > 1) timeAgo = `${diffDays} days ago`
-    
+   
     // Construct and return the alert details
     return NextResponse.json({
       id: alert.id,
