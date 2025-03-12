@@ -1,36 +1,166 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Glynac Workplace Analytics
 
-## Getting Started
+A comprehensive workplace analytics dashboard built with Next.js, Prisma, and Recharts to monitor employee behavior, risk management, retention metrics, and performance analysis.
 
-First, run the development server:
+![Screenshot (77)](https://github.com/user-attachments/assets/1d286791-d7b3-4d49-bead-6d51c6a4de45)
 
+## Features
+
+### Authentication
+- Secure login with JWT tokens using Next-Auth
+- Password hashing with bcrypt
+- Prisma ORM integration with PostgreSQL
+- CSRF protection
+- Session management
+
+### Dashboard
+- Real-time analytics with React Query for data caching
+- Interactive charts using Recharts
+- Risk alerts monitoring system
+- Performance and retention metrics
+- Modern UI with shadcn/ui components
+
+### Risk Management
+- Sexual harassment detection
+- Abusive language monitoring
+- Employee-leader dispute tracking
+- Client interaction monitoring (missed meetings, lies to clients)
+- Security risk analysis (sharing confidential information, password exposures)
+
+### Retention Analytics
+- Employee retention rate tracking
+- Calendar workload analysis
+- Complaint trend monitoring
+- Communication volume metrics
+- Sentiment analysis of workplace communications
+- Meeting load optimization suggestions
+
+### Performance Metrics
+- Performance drag visualization
+- Response time analysis
+- Negative communication tracking
+- Task completion monitoring
+- Skill utilization analysis
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **UI**: Tailwind CSS, shadcn/ui, Lucide icons
+- **State Management**: React Query for server state
+- **Authentication**: NextAuth.js with JWT
+- **Database**: PostgreSQL with Supabase
+- **ORM**: Prisma
+- **Data Visualization**: Recharts
+- **API Handling**: Axios
+- **Form Validation**: Zod
+- **Deployment**: Render with Supabase connection pooling
+
+## Installation and Setup
+
+### Prerequisites
+- Node.js 18+ and npm/yarn
+- PostgreSQL database (or Supabase account)
+
+### Setup
+1. Clone the repository
+```bash
+git clone https://github.com/your-username/glynac-workplace-analytics.git
+cd glynac-workplace-analytics
+```
+
+2. Install dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Create a `.env.local` file with your environment variables:
+```
+DATABASE_URL="postgresql://username:password@host:port/database"
+DIRECT_URL="postgresql://username:password@host:port/database"
+NEXTAUTH_SECRET="your-secure-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+4. Run Prisma migrations
+```bash
+npx prisma migrate dev
+```
+
+5. Seed the database
+```bash
+npx prisma db seed
+```
+
+6. Start the development server
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+7. Navigate to http://localhost:3000 to see the application
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Deploying to Render
 
-## Learn More
+1. Create a new Web Service in Render
+2. Connect your GitHub repository
+3. Add the following environment variables:
+   - `DATABASE_URL`: Your Supabase connection pooler URL
+   - `DIRECT_URL`: Your direct Supabase connection URL
+   - `NEXTAUTH_SECRET`: A secure secret for NextAuth
+   - `NEXTAUTH_URL`: Your Render deployment URL
+   - `PRISMA_CLIENT_ENGINE_TYPE`: Set to "dataproxy"
+4. Deploy the application
 
-To learn more about Next.js, take a look at the following resources:
+## Authentication
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application uses NextAuth.js with JWT tokens for authentication. Users can log in with their email and password, which are validated against the database. Passwords are securely hashed using bcrypt.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Default Credentials
 
-## Deploy on Vercel
+For testing purposes, you can use the following credentials:
+- Email: `admin@company.com`
+- Password: `admin123`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Database Schema
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The database schema is defined using Prisma and includes models for:
+
+- Users (employees)
+- Messages (communications)
+- Calendar items (meetings and focus time)
+- Files and file activities
+- Risk alerts
+- Performance data
+- Retention data
+
+## API Routes
+
+The application provides several API endpoints for fetching data:
+
+- `/api/dashboard/*` - Dashboard data endpoints
+- `/api/risks/*` - Risk management endpoints
+- `/api/performance/*` - Performance metrics endpoints
+- `/api/retention/*` - Retention analytics endpoints
+- `/api/employees/*` - Employee details endpoints
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgements
+
+- [shadcn/ui](https://ui.shadcn.com/) for the UI components
+- [Recharts](https://recharts.org/en-US/) for the data visualization
+- [NextAuth.js](https://next-auth.js.org/) for authentication
+- [Prisma](https://www.prisma.io/) for database access
+- [React Query](https://tanstack.com/query/latest) for data fetching
+- [Tailwind CSS](https://tailwindcss.com/) for styling
