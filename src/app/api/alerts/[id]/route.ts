@@ -34,7 +34,7 @@ export async function GET(
     }
     
     // Format participants - Always include two participants
-    let participants = []
+    const participants = []
     
     // Add the main employee
     if (alert.employee) {
