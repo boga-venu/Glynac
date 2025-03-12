@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing alert ID' }, { status: 400 });
     }
 
-    console.log("Alert ID:", alertId);
 
     // ✅ Fetch alert from the database
     const alert = await prisma.riskAlert.findUnique({
