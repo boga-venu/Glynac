@@ -64,15 +64,13 @@ A comprehensive workplace analytics dashboard built with Next.js, Prisma, and Re
 ### Setup
 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/glynac-workplace-analytics.git
-cd glynac-workplace-analytics
+git clone https://github.com/boga-venu/Glynac.git
+cd Glynac
 ```
 
 2. Install dependencies
 ```bash
 npm install
-# or
-yarn install
 ```
 
 3. Create a `.env.local` file with your environment variables:
@@ -96,8 +94,6 @@ npx prisma db seed
 6. Start the development server
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
 7. Navigate to [Glynac](https://workspace-analytics-381y.onrender.com/) to see the application
